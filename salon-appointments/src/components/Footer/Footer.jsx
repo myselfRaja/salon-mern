@@ -1,5 +1,5 @@
 import React from "react";
-import "./footer.css"; // Ensure CSS is imported
+import "./Footer.css"; // Ensure CSS is imported
 import { FaFacebookF, FaInstagram, FaTwitter } from "react-icons/fa";
 
 export default function Footer() {
