@@ -14,8 +14,10 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+  
+
     try {
-      const response = await fetch("http://localhost:3001/contact", {
+      const response = await fetch("https://salon-backend-qnkh.onrender.com/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

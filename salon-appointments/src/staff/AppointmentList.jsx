@@ -38,7 +38,7 @@ function AppointmentList() {
     try {
       setLoading(true);
       const token = localStorage.getItem("authToken");
-      const response = await fetch("http://localhost:3001/api/appointments", {
+      const response = await fetch("https://salon-backend-qnkh.onrender.com/api/appointments", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -73,7 +73,7 @@ function AppointmentList() {
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch(`http://localhost:3001/api/appointments/${id}`, {
+      const response = await fetch(`https://salon-backend-qnkh.onrender.com/api/appointments/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

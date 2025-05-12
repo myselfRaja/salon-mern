@@ -15,7 +15,7 @@ function AppointmentModal({
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
-        `http://localhost:3001/api/appointments/${editingAppointment._id}`,
+        `https://salon-backend-qnkh.onrender.com/api/appointments/${editingAppointment._id}`,
         {
           method: "PUT",
           headers: {

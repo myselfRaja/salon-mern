@@ -66,7 +66,7 @@ const AppointmentForm = ({ onAdd }) => {
     const fetchSlots = async () => {
       try {
         const dateStr = formData.date.toISOString().split('T')[0];
-        const response = await fetch(`http://localhost:3001/api/slots/available-slots?date=${dateStr}`);
+        const response = await fetch(`https://salon-backend-qnkh.onrender.com/api/slots/available-slots?date=${dateStr}`);
         const data = await response.json();
         
         if (!response.ok) throw new Error(data.error || "Failed to fetch slots");
@@ -104,7 +104,7 @@ const AppointmentForm = ({ onAdd }) => {
         duration: selectedServices.reduce((sum, s) => sum + s.duration, 0)
       };
 
-      const response = await fetch("http://localhost:3001/api/appointments", {
+      const response = await fetch("https://salon-backend-qnkh.onrender.com/api/appointments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bookingData)
