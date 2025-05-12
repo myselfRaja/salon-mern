@@ -22,11 +22,21 @@ dotenv.config(); // .env file load ho rahi hai
 // ✅ Connect to MongoDB Atlas
 // For Mongoose v6+ (Recommended)
 
+// ✅ Connect to MongoDB Atlas with proper SSL handling
 const dburl = process.env.ATLASDB_URL;
 console.log("Trying to connect to MongoDB Atlas...");
 
-// Connection code
-mongoose.connect(dburl)
+// New connection options
+const mongooseOptions = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 5000, // 5 seconds timeout
+  retryWrites: true,
+  tls: true,
+  tlsAllowInvalidCertificates: true // Temporary for testing
+};
+
+mongoose.connect(dburl, mongooseOptions)
   .then(() => console.log("✅ MongoDB Atlas se connection successful!"))
   .catch(err => {
     console.error("❌ Connection error:", err.message);
