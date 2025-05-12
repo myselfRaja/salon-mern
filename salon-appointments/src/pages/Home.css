@@ -1,0 +1,83 @@
+
+/* Hero section full screen cover */
+.container.mt-4 {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+
+.hero {
+    position: relative;
+    width: 100%;
+    height: 91vh;
+    background: url("../assets/hero1.jpg") no-repeat center center/cover;
+    animation: slideBackground 10s infinite linear;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    background-color: darkblue;
+  }
+  
+  /* Overlay for dark effect */
+  .overlay {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 50px;
+    border-radius: 10px;
+  }
+  
+  /* Text animations */
+  .fade-in {
+    font-size: 3rem;
+    font-weight: bold;
+    opacity: 0;
+    animation: fadeIn 2s forwards;
+  }
+  
+  .slide-in {
+    font-size: 1.5rem;
+    opacity: 0;
+    animation: slideIn 2s forwards 1s;
+  }
+  
+  /* Glowing button */
+  .glow-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    border: none;
+    color: white;
+    background: linear-gradient(45deg, #ff416c, #ff4b2b);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 0 10px rgba(255, 75, 43, 0.5);
+  }
+  
+  .glow-btn:hover {
+    box-shadow: 0 0 20px rgba(255, 75, 43, 0.9);
+    transform: scale(1.05);
+  }
+  
+  /* Background image sliding effect */
+  @keyframes slideBackground {
+    0% { background-image: url("../assets/hero.jpg"); }
+    33% { background-image: url("../assets/hero2.jpg"); }
+    66% { background-image: url("../assets/hero3.jpg"); }
+    100% { background-image: url("../assets/hero.jpg"); }
+  }
+  
+  /* Text animations */
+  @keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(-20px); }
+    100% { opacity: 4; transform: translateY(0); }
+  }
+  
+  @keyframes slideIn {
+    0% { opacity: 0; transform: translateX(-50px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  

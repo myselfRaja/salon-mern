@@ -1,0 +1,62 @@
+.salon-navbar {
+  background: linear-gradient(to right, #212529, #343a40);
+  padding: 0.6rem 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.salon-navbar .navbar-brand {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #ffc107;
+  letter-spacing: 1px;
+}
+
+.salon-navbar .salon-logo {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.salon-navbar .nav-link {
+  color: #ffffffcc;
+  font-weight: 500;
+  margin-right: 1rem;
+  position: relative;
+  transition: color 0.3s ease-in-out;
+}
+
+/* Hover underline effect */
+.salon-navbar .nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #ffffff;
+  transition: width 0.3s ease-in-out;
+}
+
+.salon-navbar .nav-link:hover::after,
+.salon-navbar .nav-link.active::after {
+  width: 100%;
+}
+
+.salon-navbar .nav-link:hover,
+.salon-navbar .nav-link.active {
+  color: #ffc107;
+}
+
+.brand-name {
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 1.2rem;
+}
+
+.navbar-toggler{
+  background-color: #ffc107;
+}
+
+.btn-l{
+  background-color: #bf1307;
+}

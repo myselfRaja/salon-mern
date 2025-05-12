@@ -1,0 +1,99 @@
+/* Footer Styling */
+.footer {
+    background-color: #222;
+    color: white;
+    padding: 40px 0;
+    text-align: center;
+}
+
+.footer-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    max-width: 1200px;
+    margin: auto;
+    padding: 0 20px;
+}
+
+/* Logo Section */
+.footer-services {
+    font-size: 15px;
+    margin-bottom: 15px;
+}
+
+/* Opening Hours */
+.footer-hours {
+    text-align: left;
+}
+
+.footer-hours h3 {
+    font-size: 23px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #ff4b2b;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+.footer-hours p {
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+/* Quick Links */
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin: 5px 0;
+}
+
+.footer-links a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: #ff4b2b;
+}
+
+/* Social Media Icons */
+.footer-social {
+    margin-top: 10px;
+}
+
+.footer-social a {
+    display: inline-block;
+    color: white;
+    font-size: 18px;
+    margin: 0 10px;
+    transition: transform 0.3s ease-in-out, color 0.3s;
+}
+
+.footer-social a:hover {
+    transform: scale(1.2);
+    color: #ff4b2b;
+}
+
+/* Copyright */
+.footer-bottom {
+    margin-top: 20px;
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-hours {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+}

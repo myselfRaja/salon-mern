@@ -1,0 +1,124 @@
+.about-page {
+    padding: 2rem;
+    font-family: 'Segoe UI', sans-serif;
+    color: #333;
+    background: #fff5f9;
+  }
+  
+  .about-hero {
+    text-align: center;
+    padding-bottom: 2rem;
+  }
+  
+  .about-hero h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    color: #d63384;
+  }
+  
+  .about-hero span {
+    color: #6f42c1;
+  }
+  
+  .about-hero p {
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .about-mission, .about-why {
+    margin: 2rem 0;
+    text-align: center;
+  }
+  
+  .about-mission h2,
+  
+  .about-why h2 {
+    font-size: 2rem;
+    color: #6f42c1;
+    margin-bottom: 1rem;
+  }
+  .about-team h2{
+display: flex;
+align-items: center;
+justify-content: center;
+  }
+
+  .about-mission p,
+  .about-why ul {
+    max-width: 700px;
+    margin: 0 auto;
+    font-size: 1.05rem;
+    line-height: 1.6;
+  }
+  
+  .about-why ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .about-why li {
+    background: #f9e7f0;
+    margin: 0.5rem 0;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+  }
+  
+  .about-team .team-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+  
+  .team-card {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 220px;
+    transition: transform 0.3s;
+  }
+  
+  .team-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  
+  .team-card h3 {
+    margin-top: 0.5rem;
+    font-size: 1.2rem;
+    color: #d63384;
+  }
+  
+  .cta {
+    text-align: center;
+    margin-top: 2rem;
+  }
+  
+  .cta button {
+    background-color: #d63384;
+    color: white;
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .cta button:hover {
+    background-color: #c2186a;
+  }
+  
+  @media (max-width: 768px) {
+    .team-card {
+      width: 100%;
+      max-width: 300px;
+    }
+  }
+  

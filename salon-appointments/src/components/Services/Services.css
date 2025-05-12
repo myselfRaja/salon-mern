@@ -1,0 +1,69 @@
+.services-container {
+  padding: 3rem 2rem;
+  background: #fefefe;
+  text-align: center;
+}
+
+.services-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  color: #222;
+}
+
+.services-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.service-card {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.service-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 16px;
+  margin-bottom: 1rem;
+}
+
+.service-name {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.service-description {
+  font-size: 0.95rem;
+  color: #666;
+  margin: 0.5rem 0;
+}
+
+.service-price {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #ff5757;
+  margin-bottom: 1rem;
+}
+
+.book-now-btn {
+  background: #ff5757;
+  color: #fff;
+  padding: 0.6rem 1.4rem;
+  border: none;
+  border-radius: 30px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.book-now-btn:hover {
+  background: #e63946;
+}
+
