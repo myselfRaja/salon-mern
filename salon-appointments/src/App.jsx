@@ -12,7 +12,7 @@ import Login from "./pages/Login";
 
 function App() {
   return (
-    <Router>
+    <Router basename="/">
       <div className="app-container">
         <Navbar />
         <div className="main-content container mt-4">

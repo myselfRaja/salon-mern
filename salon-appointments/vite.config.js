@@ -1,19 +1,16 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
+import path from 'path'; // ये line जरूर होनी चाहिए
 
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, 'src'),
-    },
-  },
-  server: {
-    port: 5173,
-  },
+  base: '/',
   build: {
     outDir: 'dist',
-  },
-  base: '/',
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'), // पूरा absolute path
+      }
+    }
+  }
 });

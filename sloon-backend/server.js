@@ -6,87 +6,109 @@ const dotenv = require("dotenv");
 const methodOverride = require("method-override");
 
 // Import Models & Routes
-const Appointment = require("./models/appointment"); // ✅ Model Import
-const slotRoutes = require("./routes/slotRoute"); // ✅ Slots Routes Import
-const serviceRoutes = require("./routes/serviceRoute"); // ✅ Services Routes Import
-const appointmentRoutes = require("./routes/appointmentRoutes"); // ✅ Correct Import
+const Appointment = require("./models/appointment");
+const slotRoutes = require("./routes/slotRoute");
+const serviceRoutes = require("./routes/serviceRoute");
+const appointmentRoutes = require("./routes/appointmentRoutes");
 const authRoutes = require("./routes/auth");
 
+// Load environment variables
 dotenv.config();
 
 const app = express();
 
-// ✅ Connect to MongoDB
-dotenv.config(); // .env file load ho rahi hai
-
-// ✅ Connect to MongoDB Atlas
-// For Mongoose v6+ (Recommended)
-
-// ✅ Connect to MongoDB Atlas with proper SSL handling
+// MongoDB Atlas Connection - Modern Configuration
 const dburl = process.env.ATLASDB_URL;
 console.log("Trying to connect to MongoDB Atlas...");
 
-// New connection options
 const mongooseOptions = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 5000, // 5 seconds timeout
-  retryWrites: true,
-  tls: true,
-  tlsAllowInvalidCertificates: true // Temporary for testing
+  serverSelectionTimeoutMS: 10000, // 10 seconds timeout
+  retryWrites: true
 };
 
 mongoose.connect(dburl, mongooseOptions)
-  .then(() => console.log("✅ MongoDB Atlas se connection successful!"))
+  .then(() => console.log("✅ MongoDB Atlas connection successful!"))
   .catch(err => {
-    console.error("❌ Connection error:", err.message);
-    console.log("Full error details:", err);
+    console.error("❌ MongoDB connection failed:");
+    console.error("Error code:", err.code);
+    console.error("Error message:", err.message);
+    console.error("Full error stack:", err.stack);
+    process.exit(1); // Exit if DB connection fails
   });
 
-// ✅ Set View Engine & Static Files
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-app.use(express.static(path.join(__dirname, "public")));
+// Enhanced CORS Configuration
+const allowedOrigins = [
+  'https://salon-frontend-cwz0.onrender.com',
+  'http://localhost:5173'
+];
 
-// ✅ Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-  origin: '*',
+  origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  credentials: true,
+  optionsSuccessStatus: 200
 }));
-app.use(methodOverride("_method"));
 
-// ✅ Contact Form API
+// Middleware setup
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride("_method"));
+app.use(express.static(path.join(__dirname, "public")));
+
+// View engine setup
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+  res.status(200).json({
+    status: 'healthy',
+    database: dbStatus,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Routes
+app.use("/api/slots", slotRoutes);
+app.use("/api/services", serviceRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/appointments", appointmentRoutes);
+
+// Contact Form API with validation
 app.post("/contact", (req, res) => {
   const { name, email, message } = req.body;
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
   console.log("📩 New Contact Message:", { name, email, message });
   res.status(200).json({ success: true, message: "Message received successfully!" });
 });
 
-// ✅ Routes Configuration
-app.use("/api/slots", slotRoutes); // All slot-related endpoints
-app.use("/api/services", serviceRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/appointments", appointmentRoutes); // ✅ Correct Appointment Routes Mounting
-
-// Add preflight handler
-app.options('*', cors());
-
-// ✅ Home Route
+// Home Route with error handling
 app.get("/", async (req, res) => {
   try {
-    const appointments = await Appointment.find(); // Fetch all appointments
-    res.render("index", { appointments }); // Pass appointments to EJS view
+    const appointments = await Appointment.find().lean();
+    res.render("index", { appointments });
   } catch (err) {
-    res.status(500).send("❌ Error fetching appointments: " + err.message);
+    console.error("Error fetching appointments:", err);
+    res.status(500).render("error", { message: "Failed to load appointments" });
   }
 });
 
-// ✅ Start Server
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error("🚨 Error:", err.stack);
+  res.status(500).json({ 
+    error: "Internal Server Error",
+    message: err.message 
+  });
+});
+
+// Server startup
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🛡️ CORS allowed for origins: ${allowedOrigins.join(', ')}`);
 });

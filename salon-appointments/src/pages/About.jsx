@@ -1,6 +1,7 @@
 import React from 'react';
 import './About.css';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const team = [
   {
@@ -21,6 +22,7 @@ const team = [
 ];
 
 const About = () => {
+    const navigate = useNavigate();
   return (
     <motion.div
       className="about-page"
@@ -70,7 +72,7 @@ const About = () => {
       </section>
 
       <div className="cta">
-        <button onClick={() => window.location.href = '/book'}>Book Your Experience</button>
+         <button onClick={() => navigate('/book')}>Book Your Experience</button>
       </div>
     </motion.div>
   );
