@@ -9,6 +9,11 @@
   font-size: 1.5rem;
   color: #ffc107;
   letter-spacing: 1px;
+  transition: opacity 0.2s ease;
+}
+
+.salon-navbar .navbar-brand:hover {
+  opacity: 0.9;
 }
 
 .salon-navbar .salon-logo {
@@ -21,7 +26,7 @@
 .salon-navbar .nav-link {
   color: #ffffffcc;
   font-weight: 500;
-  margin-right: 1rem;
+  margin: 0 0.75rem;
   position: relative;
   transition: color 0.3s ease-in-out;
 }
@@ -34,7 +39,7 @@
   left: 0;
   width: 0%;
   height: 2px;
-  background-color: #ffffff;
+  background-color: #ffc107;
   transition: width 0.3s ease-in-out;
 }
 
@@ -53,10 +58,33 @@
   font-size: 1.2rem;
 }
 
-.navbar-toggler{
+.navbar-toggler {
   background-color: #ffc107;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
 }
 
-.btn-l{
+.btn-login {
   background-color: #bf1307;
+  color: white;
+  border: 1px solid #bf1307;
+  transition: all 0.2s ease;
+}
+
+.btn-login:hover {
+  background-color: #a01005;
+  border-color: #a01005;
+  color: white;
+}
+
+@media (max-width: 992px) {
+  .salon-navbar .navbar-collapse {
+    padding-top: 1rem;
+  }
+  
+  .salon-navbar .d-flex {
+    margin-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
 }
