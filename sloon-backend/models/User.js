@@ -1,25 +1,23 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+// server/models/User.js
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-});
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { type: String, enum: ['admin', 'staff'], default: 'staff' }
+}, { timestamps: true });
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
+// Password hashing
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 12);
   next();
 });
 
-// ✅ Check to avoid OverwriteModelError
-const User = mongoose.models.User || mongoose.model("User", userSchema);
+// Compare password method
+userSchema.methods.comparePassword = async function(password) {
+  return await bcrypt.compare(password, this.password);
+};
 
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);

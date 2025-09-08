@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { format, parseISO } from "date-fns";
 import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./AppointmentCard.css";
+import InvoiceModal from "./InvoiceModal"; // ✅ InvoiceModal import karo
 
 function AppointmentCardGrid({
   currentAppointments,
@@ -13,6 +14,9 @@ function AppointmentCardGrid({
   appointmentsPerPage,
   currentPage,
 }) {
+  const [selectedAppointment, setSelectedAppointment] = useState(null); // ✅ Invoice ke liye
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false); // ✅ Modal control
+
   // Prepare edit data when edit button is clicked
   const prepareEditData = (appointment) => {
     setFormData({
@@ -25,6 +29,19 @@ function AppointmentCardGrid({
       totalPrice: appointment.totalPrice || 0
     });
     setEditingAppointment(appointment);
+  };
+
+  // ✅ Generate Bill button handler
+  const handleGenerateBill = (appointment) => {
+    setSelectedAppointment(appointment);
+    setShowInvoiceModal(true);
+  };
+
+  // ✅ Invoice generate hone ke baad
+  const handleInvoiceGenerated = () => {
+    setShowInvoiceModal(false);
+    setSelectedAppointment(null);
+    toast.success("Invoice generated successfully!");
   };
 
   // Animation variants
@@ -57,6 +74,15 @@ function AppointmentCardGrid({
 
   return (
     <div className="container mt-4">
+      {/* ✅ Invoice Modal */}
+      {showInvoiceModal && selectedAppointment && (
+        <InvoiceModal
+          appointment={selectedAppointment}
+          onClose={() => setShowInvoiceModal(false)}
+          onInvoiceGenerated={handleInvoiceGenerated}
+        />
+      )}
+
       <div className="row g-4">
         {currentAppointments.length > 0 ? (
           currentAppointments.map((appointment, index) => (
@@ -132,9 +158,9 @@ function AppointmentCardGrid({
                 </div>
                 
                 <div className="card-footer bg-transparent border-top-0">
-                  <div className="d-flex justify-content-between">
+                  <div className="d-flex justify-content-between gap-2">
                     <motion.button
-                      className="btn btn-outline-warning btn-sm"
+                      className="btn btn-outline-warning btn-sm flex-fill"
                       onClick={() => prepareEditData(appointment)}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -142,8 +168,18 @@ function AppointmentCardGrid({
                       Edit
                     </motion.button>
                     
+                    {/* ✅ Generate Bill Button */}
                     <motion.button
-                      className="btn btn-outline-danger btn-sm"
+                      className="btn btn-outline-success btn-sm flex-fill"
+                      onClick={() => handleGenerateBill(appointment)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Generate Bill
+                    </motion.button>
+                    
+                    <motion.button
+                      className="btn btn-outline-danger btn-sm flex-fill"
                       onClick={() => handleDelete(appointment._id)}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}

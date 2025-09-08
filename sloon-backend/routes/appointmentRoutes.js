@@ -5,6 +5,7 @@ const {
   getAllAppointments,
   updateAppointment,
   deleteAppointment,
+   generateInvoice 
 } = require("../controllers/AppointmentController");
 const authMiddleware = require("../middleware/authMiddleware");
 

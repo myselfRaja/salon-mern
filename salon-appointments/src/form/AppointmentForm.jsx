@@ -1,10 +1,16 @@
 // AppointmentForm.jsx
 import React, { useState, useEffect } from "react";
 import ServiceSelection from "./ServiceSelection";
+import { io } from "socket.io-client";
+
 import BookingForm from "./BookingForm";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./AppointmentForm.css";
 
 // Helper functions (temporary - baad mein helpers.js mein shift karenge)
+// ✅ BACKEND URL WITH ENVIRONMENT VARIABLE
+const backendURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
 const isSameDay = (date1, date2) => date1.toDateString() === date2.toDateString();
 const isTimeAfter = (slotTime, currentTime) => {
   const [slotH, slotM] = slotTime.split(':').map(Number);
@@ -18,6 +24,28 @@ const services = [
 ];
 
 const AppointmentForm = ({ onAdd }) => {
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+     const newSocket = io(backendURL, {
+      transports: ["websocket", "polling"], // fast connection
+    });
+
+    setSocket(newSocket);
+
+    newSocket.on("connect", () => {
+      console.log("⚡ Connected to socket server:", newSocket.id);
+    });
+
+    newSocket.on("welcome", (msg) => {
+      console.log("✅ Server says:", msg);
+    });
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [backendURL]);
+
   // State Variables
   const [selectedServices, setSelectedServices] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -60,32 +88,51 @@ const AppointmentForm = ({ onAdd }) => {
   };
 
   // Fetch Available Slots
-  useEffect(() => {
-    if (!formData.date || step !== 2) return;
-    
-    const fetchSlots = async () => {
-      try {
-        const dateStr = formData.date.toISOString().split('T')[0];
-        const response = await fetch(`https://salon-backend-qnkh.onrender.com/api/slots/available-slots?date=${dateStr}`);
-        const data = await response.json();
-        
-        if (!response.ok) throw new Error(data.error || "Failed to fetch slots");
-        
-        const now = new Date();
-        setAvailableSlots(
-          isSameDay(formData.date, now) 
-            ? data.availableSlots.filter(slot => isTimeAfter(slot, now)) 
-            : data.availableSlots
-        );
-      } catch (error) {
-        console.error("Slot Error:", error);
-        setAvailableSlots([]);
-        alert("Error fetching slots. Please try again.");
-      }
-    };
-    
-    fetchSlots();
-  }, [formData.date, step]);
+   // ✅ Listen for available slots from socket
+useEffect(() => {
+  if (!formData.date || step !== 2 || !socket) return;
+
+  const dateStr = formData.date.toISOString().split("T")[0];
+
+  // 🔹 API call (initial fetch)
+fetch(`${backendURL}/api/slots/available-slots?date=${dateStr}`)
+    .then((res) => res.json())
+    .then((data) => {
+      const now = new Date();
+
+      const filteredSlots = isSameDay(formData.date, now)
+        ? data.availableSlots
+            .filter((slot) => isTimeAfter(slot, now)) // ✅ past slots hide
+            .filter((slot, idx, arr) => arr.indexOf(slot) === idx) // ✅ duplicates remove
+        : data.availableSlots;
+
+      console.log("🎯 Final Available Slots (API):", filteredSlots);
+      setAvailableSlots(filteredSlots);
+    })
+    .catch((err) => console.error("❌ Error fetching slots:", err));
+
+  // 🔔 Socket listener (real-time updates)
+  socket.on("slotsUpdated", (data) => {
+    const now = new Date();
+
+    const filteredSlots = isSameDay(formData.date, now)
+      ? data.availableSlots
+          .filter((slot) => isTimeAfter(slot, now)) // ✅ past slots hide
+          .filter((slot, idx, arr) => arr.indexOf(slot) === idx) // ✅ duplicates remove
+      : data.availableSlots;
+
+    console.log("⚡ Final Available Slots (Socket):", filteredSlots);
+    setAvailableSlots(filteredSlots);
+  });
+
+  return () => {
+    socket.off("slotsUpdated");
+  };
+}, [formData.date, step, socket, backendURL]);
+
+
+
+
 
   // Form Submission
   const handleSubmit = async (e) => {
@@ -104,7 +151,7 @@ const AppointmentForm = ({ onAdd }) => {
         duration: selectedServices.reduce((sum, s) => sum + s.duration, 0)
       };
 
-      const response = await fetch("https://salon-backend-qnkh.onrender.com/api/appointments", {
+     const response = await fetch(`${backendURL}/api/appointments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bookingData)
@@ -116,9 +163,9 @@ const AppointmentForm = ({ onAdd }) => {
       setStep(1);
       setSelectedServices([]);
       setFormData({ name: "", phone: "", email: "", date: null, time: "" });
-      alert("Booking successful!");
+     toast.success("🎉 Booking successful!");
     } catch (error) {
-      alert(`Booking failed: ${error.message}`);
+      toast.error(`❌ Booking failed: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -148,6 +195,7 @@ const AppointmentForm = ({ onAdd }) => {
           onSubmit={handleSubmit}
         />
       )}
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };

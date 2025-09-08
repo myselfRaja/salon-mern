@@ -34,16 +34,24 @@ function AppointmentList() {
     }
   }, [navigate]);
 
-  const fetchAppointments = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem("authToken");
-      const response = await fetch("https://salon-backend-qnkh.onrender.com/api/appointments", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+ const fetchAppointments = async () => {
+  console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL);
+
+  try {
+    setLoading(true);
+    const token = localStorage.getItem("authToken");
+
+    // ✅ Use environment variable
+   const backendURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
+
+const response = await fetch(`${backendURL}/api/appointments`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  },
+});
+
+
 
       if (response.status === 401) {
         localStorage.removeItem("authToken");

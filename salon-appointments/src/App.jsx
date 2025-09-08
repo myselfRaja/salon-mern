@@ -9,6 +9,8 @@ import Contact from "./components/Contact/Contact";
 import About from "./pages/About";
 import Footer from "./components/Footer/Footer";
 import Login from "./pages/Login";
+import Reports from "./staff/Reports";
+// ✅ YEH ROUTE ADD KARO
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/appointments" element={<AppointmentList />} />
             <Route path="/add-appointment" element={<AppointmentForm />} />
+<Route path="/reports" element={<Reports />} />
+
           </Routes>
         </div>
         <Footer />

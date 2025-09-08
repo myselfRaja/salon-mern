@@ -1,10 +1,11 @@
 const Appointment = require("../models/appointment");
 const sendConfirmationEmail = require("../utils/emailServices");
+const Invoice = require("../models/invoice"); 
 
 // 1️⃣ CREATE APPOINTMENT
 exports.createAppointment = async (req, res) => {
     try {
-        console.log("📩 Received Data at Backend:", req.body);
+        
         const { name, phone, email, date, time, services, totalPrice } = req.body;
 
         // 🛡️ Validation
@@ -56,10 +57,21 @@ exports.createAppointment = async (req, res) => {
             totalPrice, duration: totalDuration, token: tokenNumber
         });
         await newAppointment.save();
+        
+
+        const count = await Appointment.countDocuments();
+
 
         // ✉️ Send Email
-        await sendConfirmationEmail(email, name, date, time, services, totalPrice, tokenNumber);
+        // await sendConfirmationEmail(email, name, date, time, services, totalPrice, tokenNumber);
+        
 
+        //socket.io
+const io = req.app.get("io");   // ✅ socket instance
+if (io) {
+    io.emit("slotsUpdated", { date });  // ✅ notify all connected clients
+   
+}
         res.status(201).json({ 
             message: "Appointment booked successfully!", 
             appointment: { id: newAppointment._id, token: tokenNumber, date, time, services, totalPrice }
@@ -77,7 +89,11 @@ exports.createAppointment = async (req, res) => {
 // 2️⃣ GET ALL APPOINTMENTS
 exports.getAllAppointments = async (req, res) => {
     try {
-        const appointments = await Appointment.find();
+        const appointments = await Appointment.find().populate("invoice");
+        
+        // ✅ SAHI CODE - appointmentsWithInvoice ki jagah appointments use karo
+        
+        
         res.json(appointments);
     } catch (err) {
         res.status(500).json({ error: "Error fetching appointments", message: err.message });
@@ -106,6 +122,14 @@ exports.updateAppointment = async (req, res) => {
             return res.status(404).json({ error: "Appointment not found" });
         }
 
+        // 🔔 Real-time update via Socket.IO
+const io = req.app.get("io");
+if (io) {
+    io.emit("slotsUpdated", { date });
+
+}
+
+
         res.status(200).json(updatedAppointment);
     } catch (err) {
         res.status(500).json({ error: "Error updating appointment", message: err.message });
@@ -119,8 +143,50 @@ exports.deleteAppointment = async (req, res) => {
         if (!deletedAppointment) {
             return res.status(404).json({ error: "Appointment not found" });
         }
+
+        // 🔔 Real-time update via Socket.IO
+const io = req.app.get("io");
+if (io) {
+    io.emit("slotsUpdated", { date: deletedAppointment.date });
+    console.log("📢 Emitted slotsUpdated event for date (delete):", deletedAppointment.date);
+}
+
         res.status(200).json({ message: "Appointment deleted successfully" });
     } catch (err) {
         res.status(500).json({ error: "Error deleting appointment", message: err.message });
+    }
+};
+
+exports.generateInvoice = async (req, res) => {
+    try {
+        const { appointmentId } = req.body;
+
+        const appointment = await Appointment.findById(appointmentId);
+        if (!appointment) {
+            return res.status(404).json({ message: "Appointment not found" });
+        }
+
+        // agar already invoice hai to return kar do
+        if (appointment.invoice) {
+            return res.status(400).json({ message: "Invoice already generated" });
+        }
+
+        // naya invoice banao
+        const invoice = new Invoice({
+            appointment: appointment._id,
+            customerName: appointment.name,
+            services: appointment.services,
+            totalPrice: appointment.totalPrice,
+            date: appointment.date,
+        });
+        await invoice.save();
+
+        // appointment me invoice id store karo
+        appointment.invoice = invoice._id;
+        await appointment.save();
+
+        res.status(201).json({ message: "Invoice generated", invoice });
+    } catch (err) {
+        res.status(500).json({ error: "Error generating invoice", message: err.message });
     }
 };
