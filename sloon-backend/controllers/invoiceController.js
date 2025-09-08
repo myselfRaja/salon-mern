@@ -1,4 +1,4 @@
-const Invoice = require('../models/invoice');
+const Invoice = require('../models/Invoice');
 const Appointment = require('../models/appointment');
 const SalonConfig = require('../models/SalonConfig');
 const { sendInvoiceEmail } = require('../utils/emailServices');
