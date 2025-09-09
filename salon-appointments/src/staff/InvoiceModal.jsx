@@ -6,6 +6,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { printInvoice } from '../utils/printService'; // ✅ Aapka banaya hua import
 
+ const backendURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
 
 
 const InvoiceModal = ({ appointment, onClose, onInvoiceGenerated }) => {
@@ -137,7 +138,7 @@ const getServices = () => {
   const handleDownloadPDF = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/invoices/pdf-preview`, {
+     const response = await fetch(`${backendURL}/api/invoices/pdf-preview`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

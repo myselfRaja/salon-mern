@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = "http://localhost:3001";
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
 
 // ✅ Yeh naya code - Token automatically add hoga
 const api = axios.create({
@@ -43,7 +43,7 @@ export const deleteAppointment = async (id) => {
 
 // ✅ INVOICE APIs - Simple ho gaya
 export const generateInvoice = async (invoiceData) => {
-  return await api.post('/api/invoices/generate', invoiceData);
+ return await api.post('/invoices/generate', invoiceData);
 };
 
 export const getInvoices = async () => {
