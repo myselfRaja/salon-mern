@@ -43,7 +43,7 @@ export const deleteAppointment = async (id) => {
 
 // ✅ INVOICE APIs - Simple ho gaya
 export const generateInvoice = async (invoiceData) => {
- return await api.post('/invoices/generate', invoiceData);
+  return await api.post('/api/invoices/generate', invoiceData);
 };
 
 export const getInvoices = async () => {
