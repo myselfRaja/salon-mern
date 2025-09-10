@@ -201,6 +201,35 @@
     animation: spin 1s ease-in-out infinite;
     margin-right: 8px;
   }
+
+  .error-text {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
+
+.input-error {
+  border-color: #dc3545 !important;
+}
+
+.input-error:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.date-picker.input-error {
+  border-color: #dc3545;
+}
+
+.time-slot.input-error {
+  border: 2px solid #dc3545;
+}
+
+small {
+  font-size: 11px;
+  color: #666;
+}
   
   @keyframes spin {
     to { transform: rotate(360deg); }
@@ -221,3 +250,4 @@
       text-align: center;
     }
   }
+
