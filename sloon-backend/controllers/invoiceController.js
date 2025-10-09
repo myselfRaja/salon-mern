@@ -85,25 +85,13 @@ exports.generateInvoice = async (req, res) => {
     appointment.invoice = invoice._id;
     await appointment.save();
 
-    // ✅ AUTO EMAIL STEP (NEW)
-    if (invoice.clientDetails?.email) {
-      try {
-        const pdfPath = await generatePDF(invoice);
-        await sendInvoiceEmail(invoice, pdfPath);
-
-        if (fs.existsSync(pdfPath)) {
-          fs.unlinkSync(pdfPath);
-        }
-        console.log("📩 Invoice emailed successfully!");
-      } catch (err) {
-        console.error("❌ Invoice email failed:", err);
-        // ⚠️ Important: Do NOT fail invoice creation if email fails
-      }
-    }
+    // ✅ Temporary email send ko hataya gaya hai
+   
 
     // ✅ Response
     res.status(201).json({
-      message: 'Invoice generated successfully & email sent (if email available)',
+      success: true,
+      message: 'Invoice generated successfully',
       invoice
     });
 

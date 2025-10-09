@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import ServiceSelection from "./ServiceSelection";
 import { io } from "socket.io-client";
-
+import Loader from "../components/Common/Loader";
 import BookingForm from "./BookingForm";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -60,6 +60,7 @@ const AppointmentForm = ({ onAdd }) => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [availableSlots, setAvailableSlots] = useState([]);
+   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
 
   // Service Selection Handler
   const handleServiceSelect = (service) => {
@@ -85,13 +86,14 @@ const AppointmentForm = ({ onAdd }) => {
     const localDate = new Date(date);
     localDate.setMinutes(localDate.getMinutes() - localDate.getTimezoneOffset());
     setFormData({ ...formData, date: localDate, time: "" });
+     setAvailableSlots([]); 
   };
 
   // Fetch Available Slots
    // ✅ Listen for available slots from socket
 useEffect(() => {
   if (!formData.date || step !== 2 || !socket) return;
-
+setIsLoadingSlots(true);
   const dateStr = formData.date.toISOString().split("T")[0];
 
   // 🔹 API call (initial fetch)
@@ -109,10 +111,14 @@ fetch(`${backendURL}/api/slots/available-slots?date=${dateStr}`)
       console.log("🎯 Final Available Slots (API):", filteredSlots);
       setAvailableSlots(filteredSlots);
     })
-    .catch((err) => console.error("❌ Error fetching slots:", err));
+    .catch((err) => console.error("❌ Error fetching slots:", err))
+     .finally(() => {
+      setIsLoadingSlots(false); // ✅ Loading stop karo
+    });
 
   // 🔔 Socket listener (real-time updates)
   socket.on("slotsUpdated", (data) => {
+    
     const now = new Date();
 
     const filteredSlots = isSameDay(formData.date, now)
@@ -123,6 +129,7 @@ fetch(`${backendURL}/api/slots/available-slots?date=${dateStr}`)
 
     console.log("⚡ Final Available Slots (Socket):", filteredSlots);
     setAvailableSlots(filteredSlots);
+  
   });
 
   return () => {
@@ -164,6 +171,7 @@ fetch(`${backendURL}/api/slots/available-slots?date=${dateStr}`)
       setSelectedServices([]);
       setFormData({ name: "", phone: "", email: "", date: null, time: "" });
      toast.success("🎉 Booking successful!");
+       if (onAdd) onAdd();
     } catch (error) {
       toast.error(`❌ Booking failed: ${error.message}`);
     } finally {
@@ -188,6 +196,7 @@ fetch(`${backendURL}/api/slots/available-slots?date=${dateStr}`)
           formData={formData}
           availableSlots={availableSlots}
           loading={loading}
+            isLoadingSlots={isLoadingSlots}
           onFieldChange={(field, value) => setFormData({...formData, [field]: value})}
           onDateChange={handleDateChange}
           onTimeChange={time => setFormData({...formData, time})}

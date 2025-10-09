@@ -5,6 +5,8 @@ import AppointmentModal from "./AppointmentModal";
 import SearchFilters from "./SearchFilters";
 import ExportButton from "./ExportButton";
 import { toast } from "react-toastify";
+import Loader from "../components/Common/Loader";
+
 
 function AppointmentList() {
   const [appointments, setAppointments] = useState([]);
@@ -35,40 +37,36 @@ function AppointmentList() {
   }, [navigate]);
 
  const fetchAppointments = async () => {
-  console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL);
-
   try {
     setLoading(true);
     const token = localStorage.getItem("authToken");
+    const backendURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
 
-    // ✅ Use environment variable
-   const backendURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
+    // ✅ YAHAN CHANGE KARO - limit=1000 add karo
+    const response = await fetch(`${backendURL}/api/appointments?limit=1000`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
-const response = await fetch(`${backendURL}/api/appointments`, {
-  headers: {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  },
-});
-
-
-
-      if (response.status === 401) {
-        localStorage.removeItem("authToken");
-        navigate("/login");
-        return;
-      }
-
-      if (!response.ok) throw new Error("Failed to fetch");
-      const data = await response.json();
-      setAppointments(data);
-    } catch (error) {
-      console.error("Fetch error:", error);
-      toast.error("Failed to load appointments");
-    } finally {
-      setLoading(false);
+    if (response.status === 401) {
+      localStorage.removeItem("authToken");
+      navigate("/login");
+      return;
     }
-  };
+
+    if (!response.ok) throw new Error("Failed to fetch");
+    const data = await response.json();
+    setAppointments(data.appointments || []);
+     
+  } catch (error) {
+    console.error("Fetch error:", error);
+    toast.error("Failed to load appointments");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleUpdateSuccess = (updatedAppointment) => {
     setAppointments(prev => 
@@ -81,7 +79,9 @@ const response = await fetch(`${backendURL}/api/appointments`, {
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch(`https://salon-backend-qnkh.onrender.com/api/appointments/${id}`, {
+     const backendURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
+const response = await fetch(`${backendURL}/api/appointments/${id}`, {
+
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -98,25 +98,41 @@ const response = await fetch(`${backendURL}/api/appointments`, {
     }
   };
 
-  const filteredAppointments = appointments.filter((appt) => {
-    const matchesName = appt.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDate = filterDate
-      ? new Date(appt.date).toISOString().split("T")[0] === filterDate
-      : true;
-    return matchesName && matchesDate;
-  });
+  // ✅ YEH NAYA CODE ADD KARO
 
-  const indexOfLast = currentPage * appointmentsPerPage;
-  const indexOfFirst = indexOfLast - appointmentsPerPage;
-  const currentAppointments = filteredAppointments.slice(indexOfFirst, indexOfLast);
+// 1. Pehle filtered appointments safe way mein calculate karo
+const filteredAppointments = (appointments || []).filter((appt) => {
+  const matchesName = appt.name?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
+  const matchesDate = filterDate
+    ? new Date(appt.date).toISOString().split("T")[0] === filterDate
+    : true;
+  return matchesName && matchesDate;
+});
 
-  const totalPages = Math.ceil(filteredAppointments.length / appointmentsPerPage);
+// 2. Current page ki appointments
+const indexOfLast = currentPage * appointmentsPerPage;
+const indexOfFirst = indexOfLast - appointmentsPerPage;
+const currentAppointments = filteredAppointments.slice(indexOfFirst, indexOfLast);
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
+// 3. Total pages calculation
+const totalPages = Math.ceil(filteredAppointments.length / appointmentsPerPage);
 
-  if (loading) return <div className="text-center my-5">Loading...</div>;
+// 4. ✅ NAYA PAGINATION LOGIC - Sirf 10 buttons dikhane ke liye
+const visiblePageCount = 10;
+const currentGroup = Math.floor((currentPage - 1) / visiblePageCount);
+const startPage = currentGroup * visiblePageCount + 1;
+const endPage = Math.min(startPage + visiblePageCount - 1, totalPages);
+const visiblePages = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+
+const handlePageChange = (page) => {
+  setCurrentPage(page);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+
+  if (loading) return <Loader type="overlay" message="Loading appointments..." />;
+
+
 
   return (
     <div className="container mt-4">
@@ -142,6 +158,10 @@ const response = await fetch(`${backendURL}/api/appointments`, {
         onUpdateSuccess={handleUpdateSuccess}
         isUpdating={isUpdating}
         setIsUpdating={setIsUpdating}
+          onAdd={() => {
+    setCurrentPage(1);   // Reset to first page
+    fetchAppointments(); // Re-fetch appointments
+  }}
       />
 
       <AppointmentTable
@@ -151,19 +171,41 @@ const response = await fetch(`${backendURL}/api/appointments`, {
         handleDelete={handleDelete}
       />
 
-      {totalPages > 1 && (
-        <div className="d-flex justify-content-center mt-3">
-          {Array.from({ length: totalPages }, (_, index) => (
-            <button
-              key={index}
-              onClick={() => handlePageChange(index + 1)}
-              className={`btn mx-1 ${currentPage === index + 1 ? 'btn-primary' : 'btn-outline-primary'}`}
-            >
-              {index + 1}
-            </button>
-          ))}
-        </div>
-      )}
+{totalPages > 1 && (
+  <div className="d-flex justify-content-center mt-3 flex-wrap">
+    {/* ✅ "Prev 10" button - jab 1st group nahi ho */}
+    {startPage > 1 && (
+      <button
+        className="btn btn-outline-secondary mx-1"
+         onClick={() => handlePageChange(startPage - visiblePageCount)}
+      >
+        « Prev 10
+      </button>
+    )}
+
+    {/* Page Numbers */}
+    {visiblePages.map((page) => (
+      <button
+        key={page}
+        onClick={() => handlePageChange(page)}
+        className={`btn mx-1 ${currentPage === page ? "btn-primary" : "btn-outline-primary"}`}
+      >
+        {page}
+      </button>
+    ))}
+
+    {/* ✅ "Next 10" button - jab last group nahi ho */}
+    {endPage < totalPages && (
+      <button
+        className="btn btn-outline-secondary mx-1"
+        onClick={() => handlePageChange(endPage + 1)}
+      >
+        Next 10 »
+      </button>
+    )}
+  </div>
+)}
+
     </div>
   );
 }

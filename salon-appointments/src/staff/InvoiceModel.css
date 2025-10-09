@@ -38,6 +38,17 @@
   font-weight: 600;
 }
 
+.btn-generate.generated {
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+  cursor: not-allowed;
+}
+
+.btn-generate:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .close-btn {
   background: none;
   border: none;

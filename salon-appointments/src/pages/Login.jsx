@@ -4,6 +4,7 @@ import axios from "axios";
 import "./Login.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Loader from "../components/Common/Loader"; 
 
 // ... imports same
 
@@ -11,10 +12,12 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+   const [loading, setLoading] = useState(false); 
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMsg("");
+      setLoading(true); 
 
     const trimmedUsername = username.trim();
     const trimmedPassword = password.trim();
@@ -38,11 +41,14 @@ const Login = () => {
                      "Server unavailable. Try later.";
       setErrorMsg(message);
       toast.error(message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="login-wrapper">
+      {loading && <Loader type="overlay" message="Logging in..." />} 
       <div className="login-card animated">
         <h2 className="text-center mb-4">Admin Login</h2>
         <form onSubmit={handleLogin}>
@@ -74,9 +80,10 @@ const Login = () => {
             />
           </div>
 
-          <button type="submit" className="btn btn-dark w-100">
-            Login
-          </button>
+          <button type="submit" className="btn btn-dark w-100" disabled={loading}>
+  {loading ? "Please wait..." : "Login"}
+</button>
+
 
           {errorMsg && <div className="alert alert-danger mt-3">{errorMsg}</div>}
         </form>

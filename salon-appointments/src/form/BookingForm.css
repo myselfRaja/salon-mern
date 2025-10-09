@@ -101,7 +101,7 @@
   
   .form-group input:focus,
   .date-picker:focus {
-    border-color: #ff7675;
+    border-color: #007b14;
     outline: none;
     box-shadow: 0 0 0 3px rgba(255, 118, 117, 0.1);
   }
@@ -141,6 +141,11 @@
     cursor: not-allowed;
   }
   
+  .slots-loading .spinner {
+  width: 40px;
+  height: 40px;
+}
+
   .no-slots {
     color: #ff7675;
     text-align: center;

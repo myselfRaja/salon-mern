@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import Loader from '../components/Common/Loader';
 import "./BookingForm.css";
 
 const BookingForm = ({
@@ -10,6 +11,7 @@ const BookingForm = ({
   formData,
   availableSlots,
   loading,
+  isLoadingSlots,
   onFieldChange,
   onDateChange,
   onTimeChange,
@@ -78,7 +80,7 @@ const BookingForm = ({
     onSubmit(e);
   };
 
-  return (
+   return (
     <form onSubmit={handleSubmit} className="booking-form">
       <div className="form-header">
         <h2>Complete Your Booking</h2>
@@ -172,18 +174,27 @@ const BookingForm = ({
             <div className="form-group">
               <label>Available Time Slots *</label>
               <div className="time-slot-grid">
-                {availableSlots.map(slot => (
-                  <button
-                    type="button"
-                    key={slot}
-                    className={`time-slot ${formData.time === slot ? 'selected' : ''} ${errors.time ? 'input-error' : ''}`}
-                    onClick={() => onTimeChange(slot)}
-                    disabled={availableSlots.length === 0}
-                  >
-                    {slot}
-                  </button>
-                ))}
-                {availableSlots.length === 0 && (
+                {/* ✅ YEH SECTION UPDATE KARO */}
+                {isLoadingSlots ? (
+                  // 🔄 Loading state - Loader dikhao
+                  <div className="slots-loading">
+                    <Loader />
+                    <span>Loading available slots...</span>
+                  </div>
+                ) : availableSlots.length > 0 ? (
+                  // ✅ Slots available hain
+                  availableSlots.map(slot => (
+                    <button
+                      type="button"
+                      key={slot}
+                      className={`time-slot ${formData.time === slot ? 'selected' : ''} ${errors.time ? 'input-error' : ''}`}
+                      onClick={() => onTimeChange(slot)}
+                    >
+                      {slot}
+                    </button>
+                  ))
+                ) : (
+                  // ❌ Koi slots available nahi hain
                   <p className="no-slots">No available slots for this date</p>
                 )}
               </div>

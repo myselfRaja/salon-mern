@@ -224,17 +224,17 @@ const getServices = () => {
           setGeneratedInvoiceId(response.data.invoice._id);
 
           // ✅ Auto send email
-          try {
-            const emailRes = await sendInvoiceEmail(response.data.invoice._id);
-            if (emailRes.data?.success) {
-              toast.success("📧 Invoice emailed to customer!");
-            } else {
-              toast.error(emailRes.data?.message || "Invoice generated but email failed");
-            }
-          } catch (err) {
-            console.error("❌ Email auto-send failed:", err);
-            toast.error("Invoice generated but email failed");
-          }
+          // try {
+          //   const emailRes = await sendInvoiceEmail(response.data.invoice._id);
+          //   if (emailRes.data?.success) {
+          //     toast.success("📧 Invoice emailed to customer!");
+          //   } else {
+          //     toast.error(emailRes.data?.message || "Invoice generated but email failed");
+          //   }
+          // } catch (err) {
+          //   console.error("❌ Email auto-send failed:", err);
+          //   toast.error("Invoice generated but email failed");
+          // }
         }
 
         // ✅ 2s ke baad modal close hoga
@@ -363,9 +363,20 @@ const getServices = () => {
             🖨️ Print
           </button>
  
-          <button className="btn-generate" onClick={handleGenerateInvoice} disabled={loading}>
-            {loading ? 'Generating...' : '💳 Generate Invoice'}
-          </button>
+          <button 
+  className={`btn-generate ${generatedInvoiceId || appointment?.invoice?._id ? 'generated' : ''}`}
+  onClick={handleGenerateInvoice} 
+  disabled={loading || generatedInvoiceId || appointment?.invoice?._id}
+  title={generatedInvoiceId || appointment?.invoice?._id ? "Invoice already generated" : "Generate new invoice"}
+>
+  {loading ? (
+    '⏳ Generating...'
+  ) : generatedInvoiceId || appointment?.invoice?._id ? (
+    '✅ Invoice Generated'
+  ) : (
+    '💳 Generate Invoice'
+  )}
+</button>
           <ToastContainer position="top-center" autoClose={3000} />
 
         </div>
